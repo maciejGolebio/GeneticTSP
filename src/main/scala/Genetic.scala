@@ -93,12 +93,44 @@ object Genetic extends App {
     swap(Random.between(0, p1.length), Random.between(0, p1.length))
   }
 
-  def selection(population: List[Array[Int]], graph: Array[Array[Int]]): List[(Array[Int], Double)] = {
+  def selection(population: mutable.Set[Array[Int]], graph: Array[Array[Int]]): mutable.Set[Array[Int]] = {
     import Graph.dist
-    val p = population.map(x => (x, 0.001 / dist(graph, x)))
+    var p = population map (x => (x, 0.001 / dist(graph, x))) toArray
     val sum = p.map(_._2).sum
-    p.map(x => (x._1, (x._2 / sum) * 360))
-  }
+    val cross: Int = (population.size * 0.7).toInt
+    val mut: Int = (population.size * 0.1).toInt
+    val champ: Int = population.size - cross - mut
+    val newPop: mutable.Set[Array[Int]] = mutable.Set.empty
+    p = p map (x => (x._1, (x._2 / sum) * 360))
 
+    var tmp = 0
+    for (i <- p.indices) {
+      p(i) = (p(i)._1, p(i)._2 + tmp)
+      tmp += p(i)._2
+    }
+    tmp = 0
+    //crossover
+    while (tmp <= cross) {
+      val r1 = Random.between(0, 360)
+      val r2 = Random.between(0, 360)
+      newPop.add(crossover(p.filter(_._2 < r1).head._1, p.filter(_._2 < r2).head._1))
+      tmp = newPop.size
+    }
+    //mutation
+    while (tmp <= cross + mut) {
+      newPop.add(mutation(p(Random.between(0, p.length))._1))
+      tmp = newPop.size
+    }
+    //champs
+    val champs = p to collection.mutable.Set
+    while (tmp == population.size) {
+      val max = champs.maxBy(_._2)
+      val champ = champs.filter(_._2 == max).head
+      champs -= champ
+      newPop.add(champ._1)
+      tmp = newPop.size
+    }
+    newPop
+  }
 
 }
