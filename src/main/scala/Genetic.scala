@@ -1,5 +1,6 @@
 import scala.collection.mutable
 import scala.util.Random
+import scala.language.postfixOps
 
 object Genetic extends App {
 
@@ -106,7 +107,7 @@ object Genetic extends App {
     var tmp = 0
     for (i <- p.indices) {
       p(i) = (p(i)._1, p(i)._2 + tmp)
-      tmp += p(i)._2
+      tmp += p(i)._2.toInt
     }
     tmp = 0
     //crossover
