@@ -40,13 +40,13 @@ object Genetic extends App {
         }
       }
     }
-  /*  for (i <- edgesTable.indices) {
-      print(i + ":  ")
-      edgesTable(i).map(x => if (x._2) {
-        x._1.toString + "+ "
-      } else x._1.toString + " ").foreach(print)
-      println()
-    }*/
+    /*  for (i <- edgesTable.indices) {
+        print(i + ":  ")
+        edgesTable(i).map(x => if (x._2) {
+          x._1.toString + "+ "
+        } else x._1.toString + " ").foreach(print)
+        println()
+      }*/
     edgesTable
   }
 
@@ -83,11 +83,22 @@ object Genetic extends App {
     c
   }
 
+  def mutation(p1: Array[Int]): Array[Int] = {
+    val mut = p1.clone()
+    val swap = (x1: Int, x2: Int) => {
+      mut(x1) = p1(x2)
+      mut(x2) = p1(x1)
+      mut
+    }
+    swap(Random.between(0, p1.length), Random.between(0, p1.length))
+  }
 
-  def mutation(p1: Array[Int]): Array[Int] = ???
+  def selection(population: List[Array[Int]], graph: Array[Array[Int]]): List[(Array[Int], Double)] = {
+    import Graph.dist
+    val p = population.map(x => (x, 0.001 / dist(graph, x)))
+    val sum = p.map(_._2).sum
+    p.map(x => (x._1, (x._2 / sum) * 360))
+  }
 
-  def selection(population: List[Array[Int]]): List[Array[Int]] = ???
-
-  crossover(Array(0, 1, 2, 3, 4), Array(1, 4, 0, 2, 3))
 
 }
